@@ -65,7 +65,8 @@ contract Vault {
         // mint the user the amount of tokens equal to the amount of ETH sent
         // get the amount of tokens to mint
         // mint the tokens to the user
-        i_rebaseToken.mint(msg.sender, msg.value);
+        uint256 interestRate = i_rebaseToken.getInterestRate();
+        i_rebaseToken.mint(msg.sender, msg.value, interestRate);
         emit Deposit(msg.sender, msg.value);
     }
 
