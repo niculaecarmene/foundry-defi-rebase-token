@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.24;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -41,6 +41,12 @@ contract RebaseToken is ERC20, Ownable, AccessControl{
     ************************/    
     event InterestRateSet(uint256 newRate);
 
+    struct MintingInfo {
+        uint256 amountMinted;
+        uint256 interestRateAtMint;
+        uint256 timestampAtMint;
+    }
+
     constructor() ERC20("Rebase Token", "RBT") Ownable(msg.sender){
 
     }
@@ -61,9 +67,7 @@ contract RebaseToken is ERC20, Ownable, AccessControl{
         if (balance == 0) {
             return 0;
         }
-        console.log("RT.balanceOf(..) - balance", balance);
         uint256 interest = _calculateInterestSinceLastUpdate(account);
-        console.log("RT.balanceOf(..) - interest", interest);
         uint256 result = (balance * interest) / PRECISION_FACTOR;
         console.log("RT.balanceOf(..) - result", result);
         return (balance * interest) / PRECISION_FACTOR;
@@ -113,7 +117,6 @@ contract RebaseToken is ERC20, Ownable, AccessControl{
         if (balanceOf(_recipient) == 0) {
             s_userInterestRate[_recipient] = s_userInterestRate[_sender];
         }
-        console.log("_sender",_sender);
         return super.transferFrom(_sender, _recipient, _amount);
     }
 
@@ -125,7 +128,7 @@ contract RebaseToken is ERC20, Ownable, AccessControl{
      * @notice grant the mint and burn role to the account
      * @param _account the account to grant the mint and burn role
      */
-    function grantMintAndBurnRole(address _account) public onlyOwner {
+    function grantMintAndBurnRole(address _account) external onlyOwner {
         _grantRole(MINT_AND_BURN_ROLE, _account);
     }
 
@@ -150,28 +153,27 @@ contract RebaseToken is ERC20, Ownable, AccessControl{
      * @notice 2. set the user interest rate to the current interest rate
      * @notice 3. mint the token to the user
      */
+    /*
     function mint(address _to, uint256 _amount, uint256 _userInterestRate) external onlyRole(MINT_AND_BURN_ROLE) {
-        console.log("START mint");
         _mintAccruedInterest(_to);
         s_userInterestRate[_to] = _userInterestRate;
-        console.log("mint - before _mint");
         _mint(_to, _amount);
-    }
-    /*function mint(address _to, uint256 _amount) external onlyRole(MINT_AND_BURN_ROLE) {
-        // Check if the user is new (has no principal balance)
-        bool isNewUser = super.balanceOf(_to) == 0;
+    }*/
+    function mint(address _to, uint256 _amount) external onlyRole(MINT_AND_BURN_ROLE) {
 
+        console.log("address",_to);
+        console.log("amount", _amount);
         // Mint accrued interest (does nothing for new users)
         _mintAccruedInterest(_to);
 
-        // Set interest rate ONLY for new users
-        if (isNewUser) {
-            s_userInterestRate[_to] = s_interestRate;
-        }
+        // Update interest rate
+        s_userInterestRate[_to] = s_interestRate;
+
+        console.log("userInterestRate", s_userInterestRate[_to]);
 
         // Mint the new tokens
         _mint(_to, _amount);
-    }*/
+    }
 
     /**
      * @notice burn the user tokens when the withdraw from the vault

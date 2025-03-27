@@ -8,8 +8,8 @@ import {IRebaseToken} from "./interfaces/IRebaseToken.sol";
 
 contract RebaseTokenPool is TokenPool{
 
-    constructor(IERC20 _token, address [] memory _allowList, address _rnmProxy, address _router) 
-        TokenPool(_token, _allowList, _rnmProxy, _router) {
+    constructor(IERC20 _token, address [] memory _allowList, address _rmnProxy, address _router) 
+        TokenPool(_token, _allowList, _rmnProxy, _router) {
 
     }
 
@@ -32,8 +32,7 @@ contract RebaseTokenPool is TokenPool{
         returns (Pool.ReleaseOrMintOutV1 memory){
 
         _validateReleaseOrMint(releaseOrMintIn);
-        uint256 interestRate = abi.decode(releaseOrMintIn.sourcePoolData, (uint256));
-        IRebaseToken(address(i_token)).mint(releaseOrMintIn.receiver, releaseOrMintIn.amount, interestRate);
+        IRebaseToken(address(i_token)).mint(releaseOrMintIn.receiver, releaseOrMintIn.amount);
 
         return Pool.ReleaseOrMintOutV1({
             destinationAmount: releaseOrMintIn.amount

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
 import {RebaseToken} from "../src/RebaseToken.sol";
@@ -10,7 +10,6 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract RebaseTokenTest is Test {
     RebaseToken private rebaseToken;
     Vault private vault;
-    uint256 public interestRate;
 
     uint256 public constant AMOUNT = 1000;
     uint256 public constant MIN_AMOUNT = 1e5;
@@ -28,7 +27,6 @@ contract RebaseTokenTest is Test {
         vault = new Vault(IRebaseToken(address(rebaseToken)));
         vm.prank(OWNER);
         rebaseToken.grantMintAndBurnRole(address(vault));
-        interestRate = rebaseToken.getInterestRate();
         vm.stopPrank();
     }
 
@@ -156,7 +154,7 @@ contract RebaseTokenTest is Test {
     function testCanootCallMintAndBurn() public{
         vm.prank(USER);
         vm.expectRevert();
-        rebaseToken.mint(USER, 1000, interestRate);
+        rebaseToken.mint(USER, 1000);
         vm.expectRevert();
         rebaseToken.burn(USER, 1000);
     }
@@ -190,7 +188,7 @@ contract RebaseTokenTest is Test {
         vm.prank(USER);
         console.log("BEFORE MINT - TEST", rebaseToken.isGrantMintAndBurnRole());
         vm.startPrank(USER);
-        rebaseToken.mint(USER, 1000, interestRate);
+        rebaseToken.mint(USER, 1000);
         console.log("testTransferFrom - after mint");
         rebaseToken.approve(USER, 500);
         rebaseToken.transferFrom(USER, USER2, 500);
@@ -206,12 +204,12 @@ contract RebaseTokenTest is Test {
 
         // 2. user mints 1000
         vm.prank(USER);
-        rebaseToken.mint(USER, AMOUNT, interestRate);
+        rebaseToken.mint(USER, AMOUNT);
 
         // 3. OWNER tries to mint for the USER, but it should be reverted, the balance of USER should stay 1000
         vm.prank(OWNER);
         vm.expectRevert();
-        rebaseToken.mint(USER, AMOUNT, interestRate);
+        rebaseToken.mint(USER, AMOUNT);
         assertEq(rebaseToken.balanceOf(USER), AMOUNT);
 
         // 4. USER burns 1000
@@ -234,7 +232,7 @@ contract RebaseTokenTest is Test {
 
         // 2. user mints 1000
         vm.prank(USER2);
-        rebaseToken.mint(USER, AMOUNT, interestRate);
+        rebaseToken.mint(USER, AMOUNT);
         vm.warp(block.timestamp + 365 days);
 
         // 3. user2 tries to transfer 500
@@ -255,7 +253,7 @@ contract RebaseTokenTest is Test {
 
         // 2. user mints 1000
         vm.prank(USER);
-        rebaseToken.mint(USER, AMOUNT, interestRate);
+        rebaseToken.mint(USER, AMOUNT);
         //vm.expectRevert();
         vm.prank(USER);
         rebaseToken.transfer(USER2, AMOUNT);

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.24;
 
 import {IRebaseToken} from "./interfaces/IRebaseToken.sol";
 import {console} from "forge-std/console.sol";
@@ -65,8 +65,11 @@ contract Vault {
         // mint the user the amount of tokens equal to the amount of ETH sent
         // get the amount of tokens to mint
         // mint the tokens to the user
-        uint256 interestRate = i_rebaseToken.getInterestRate();
-        i_rebaseToken.mint(msg.sender, msg.value, interestRate);
+
+        console.log("vault - interestrate", i_rebaseToken.getInterestRate());
+        i_rebaseToken.mint(msg.sender, msg.value);
+        console.log("vault - user address", msg.sender);
+        console.log("vault - user interestrate after mint", i_rebaseToken.getUserInterestRate(msg.sender));
         emit Deposit(msg.sender, msg.value);
     }
 
