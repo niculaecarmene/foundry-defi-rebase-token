@@ -11,7 +11,8 @@ remappings = ["@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
               "@chainlink/contracts=lib/chainlink-brownie-contracts/contracts",
               "@ccip/contracts=lib/ccip/contracts",
               "@chainlink-local=lib/chainlink-local",
-              "forge-std=lib/forge-std/src"
+              "forge-std=lib/forge-std/src",
+              "@chainlink/contracts-ccip=lib/chainlink/contracts/src/v0.8"
 ]
 
 
